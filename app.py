@@ -71,10 +71,13 @@ usuarios_selecionados = [
     "DIEGO SOUSA", "SANDRO LUIS", "ADELSON", "ARTHUR", "CLAUDIO"
 ]
 
-df_despesa_filtrado_usuarios = df_despesa_filtrado[df_despesa_filtrado["USUÁRIO"].isin(usuarios_selecionados)]
+tecnicos_off = ["ROBERTO", "DIEGO HENRIQUE"]
 
-mo_receitas = df_receita_filtrado["M.O"].sum()   
-tecnico_despesas = df_despesa_filtrado_usuarios["VALOR R$"].sum()  
+df_despesa_filtrado_usuarios = df_despesa_filtrado[df_despesa_filtrado["USUÁRIO"].isin(usuarios_selecionados)]
+df_receita_ativos = df_receita_filtrado[~df_receita_filtrado["TÉCNICO"].isin(tecnicos_off)]
+
+mo_receitas = df_receita_ativos["M.O"].sum()   
+tecnico_despesas = df_despesa_filtrado_usuarios["VALOR R$"].sum() 
 
 lucro_bruto_mo = mo_receitas - tecnico_despesas
 
