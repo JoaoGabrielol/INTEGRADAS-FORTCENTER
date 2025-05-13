@@ -126,6 +126,56 @@ df_lucros_tecnicos.reset_index(drop=True, inplace=True)
 st.write("### Lucro por Técnico")
 st.dataframe(df_lucros_tecnicos) 
 
+st.markdown("## 🔗 Acessar Dashboards Individuais")
+st.markdown("Visualize separadamente os painéis de receitas e despesas:")
+
+col1, col2 = st.columns(2)
+
+botao_style = """
+    <style>
+    .botao-link {
+        background-color: #2d5576;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        transition: 0.3s;
+        width: 100%;
+    }
+    .botao-link:hover {
+        background-color: #1e3b54;
+        cursor: pointer;
+    }
+    </style>
+"""
+
+# Exibir o estilo
+st.markdown(botao_style, unsafe_allow_html=True)
+
+with col1:
+    st.markdown(
+        """
+        <a href="https://receitas-fortcenter.streamlit.app/" target="_blank">
+            <div class="botao-link">📊 Dashboard de Receitas</div>
+        </a>
+        """,
+        unsafe_allow_html=True
+    )
+
+with col2:
+    st.markdown(
+        """
+        <a href="https://despesas-fortcenter.streamlit.app/" target="_blank">
+            <div class="botao-link">💸 Dashboard de Despesas</div>
+        </a>
+        """,
+        unsafe_allow_html=True
+    )
+    
 st.divider()
 
 if periodo_selecionado in ["Ano Atual", "Últimos 6 Meses", "Últimos 3 Meses"]:
