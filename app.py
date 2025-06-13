@@ -21,12 +21,7 @@ token_receita = auth_receita()
 headers_receita = {"Authorization": f"Bearer {token_receita}", "Content-Type": "application/json"}
 df_receita = proc_receita(arquivos_receita, drive_id, headers_receita)
 
-df_venda_balcao = pd.read_excel("Venda_Balcao.xlsx", header=0, usecols=['Dt. Neg.', 'Vlr. Nota'])
-df_venda_balcao.rename(columns={'Dt. Neg.': 'DATA', 'Vlr. Nota': 'VALOR R$'}, inplace=True)
-df_venda_balcao["ORIGEM"] = "Venda_Balcao"
-df_receita["ORIGEM"] = "Outras Planilhas"
-df_receitas_unificado = pd.concat([df_receita, df_venda_balcao], ignore_index=True)
-
+df_receitas_unificado = df_receita.copy()
 df_receitas_unificado = limpar_receita(df_receitas_unificado)
 
 arquivos_despesa = [
@@ -53,6 +48,15 @@ df_despesa_filtrado, _, _ = filtrar_despesa(df_despesa, periodo_selecionado)
 
 if inicio_periodo and fim_periodo:
     st.write(f"**Período selecionado:** {inicio_periodo.strftime('%d/%m/%Y')} a {fim_periodo.strftime('%d/%m/%Y')}")
+
+# Filtro por Técnico
+tecnicos_unicos = sorted(df_receita_filtrado["TÉCNICO"].dropna().unique())
+tecnico_selecionado = st.sidebar.selectbox("Filtrar por Técnico:", ["Todos"] + list(tecnicos_unicos))
+
+# Aplicar o filtro se necessário
+if tecnico_selecionado != "Todos":
+    df_receita_filtrado = df_receita_filtrado[df_receita_filtrado["TÉCNICO"] == tecnico_selecionado]
+    df_despesa_filtrado = df_despesa_filtrado[df_despesa_filtrado["USUÁRIO"] == tecnico_selecionado]
 
 receita_total = df_receita_filtrado["VALOR R$"].sum()
 despesa_total = df_despesa_filtrado["VALOR R$"].sum()
