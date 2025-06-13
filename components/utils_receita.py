@@ -15,28 +15,35 @@ def padronizar_nome(nome):
     return nome
 
 def padronizar_e_limpar(df):
-    for col in [ "USUÁRIO"]:
+    for col in ["USUÁRIO", "TÉCNICO"]:
         if col in df.columns:
-            df[col] = df[col].fillna("Não informado")
-    if "USUÁRIO" in df.columns:
-        df["USUÁRIO"] = df["USUÁRIO"].apply(padronizar_nome)
-    if "TÉCNICO" in df.columns:
-        df["TÉCNICO"] = df["TÉCNICO"].apply(padronizar_nome)
-        
-    # Garantir que as colunas "PEÇAS", "M.O", e "VALOR R$" sejam numéricas
-    df["PEÇAS"] = pd.to_numeric(df["PEÇAS"], errors="coerce")
-    df["M.O"] = pd.to_numeric(df["M.O"], errors="coerce")
-    df["VALOR R$"] = pd.to_numeric(df["VALOR R$"], errors="coerce")
-    
-    # Agora podemos fazer a filtragem
-    df = df[(df["PEÇAS"].notnull() & (df["PEÇAS"] > 0)) | 
-            (df["M.O"].notnull() & (df["M.O"] > 0)) | 
-            (df["VALOR R$"] >= 0)]
-    
+            df[col] = df[col].fillna("Não informado").apply(padronizar_nome)
+
+    for col in ["PEÇAS", "M.O", "VALOR R$"]:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+
+    # Aplica o filtro apenas se a coluna existir
+    condicoes = []
+    if "PEÇAS" in df.columns:
+        condicoes.append(df["PEÇAS"].notnull() & (df["PEÇAS"] > 0))
+    if "M.O" in df.columns:
+        condicoes.append(df["M.O"].notnull() & (df["M.O"] > 0))
+    if "VALOR R$" in df.columns:
+        condicoes.append(df["VALOR R$"].notnull() & (df["VALOR R$"] > 0))
+
+    if condicoes:
+        filtro_final = condicoes[0]
+        for cond in condicoes[1:]:
+            filtro_final |= cond
+        df = df[filtro_final]
+
     if "DATA" in df.columns:
-        df.loc[:, "DATA"] = pd.to_datetime(df["DATA"], errors="coerce")
+        df["DATA"] = pd.to_datetime(df["DATA"], errors="coerce")
+
     obrigatorios = [col for col in ["DATA", "USUÁRIO", "VALOR R$"] if col in df.columns]
     df = df.dropna(subset=obrigatorios)
+
     return df
 
 def filtrar_dados(df, periodo):
